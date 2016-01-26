@@ -23,6 +23,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.IO.Compression;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -303,15 +304,28 @@ namespace Cobble
         }
         private void DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
         {
-            //Download Completed
-            txbUpToDate.Text = $"Download Complete! v{AppxVersion.VersionNumber}-{AppxVersion.Release}";
-            txbProgress.Text = "";
-            //Hago Update a la version local.
-            Properties.Settings.Default.CurrentRelease = AppxVersion.Release;
-            Properties.Settings.Default.CurrentVersion = AppxVersion.VersionNumber;
-            Properties.Settings.Default.Save();
-            AppxVersion = null;
-            DownloadCompleted = true;
+            //Unzip the file.            
+            string filepath = $@"Res\{AppxVersion.FileName}.zip";
+            if (!File.Exists(filepath))
+            {
+                txbUpToDate.Text = $"Download Failed! v{AppxVersion.VersionNumber}-{AppxVersion.Release}";
+                txbProgress.Text = "";
+                AppxVersion = null;
+                return;
+            }
+            else
+            {
+                ZipFile.ExtractToDirectory(filepath, "Res");
+                //Download Completed
+                txbUpToDate.Text = $"Download Complete! v{AppxVersion.VersionNumber}-{AppxVersion.Release}";
+                txbProgress.Text = "";
+                //Hago Update a la version local.
+                Properties.Settings.Default.CurrentRelease = AppxVersion.Release;
+                Properties.Settings.Default.CurrentVersion = AppxVersion.VersionNumber;
+                Properties.Settings.Default.Save();
+                AppxVersion = null;
+                DownloadCompleted = true;
+            }            
         }
 
         private async void btnUpdate_Click(object sender, RoutedEventArgs e)

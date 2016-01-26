@@ -88,7 +88,7 @@ namespace Cobble.Models
             {
                 if (Url != null && FileName != null)
                 {
-                    string filePath = $"Res\\{FileName}";
+                    string filePath = $"Res\\{FileName}.zip";
                     //We download our update.
                     //HttpClient client = new HttpClient();
                     WebClient wclient = new WebClient();
